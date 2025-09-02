@@ -1,44 +1,43 @@
-import fs from "fs/promises";
-import path from "path";
-import { v4 as uuidv4 } from "uuid";
+import Contact from "../models/contact.js";
 
-const contactsPath = path.resolve("db", "contacts.json");
+const listContacts = async () => {
+  return Contact.findAll({ order: [["createdAt", "DESC"]] });
+};
 
-// Допоміжна функція для зчитування
-async function readContacts() {
-  const data = await fs.readFile(contactsPath, "utf-8");
-  return JSON.parse(data);
-}
+const getContactById = async (id) => {
+  return Contact.findByPk(id);
+};
 
-// Допоміжна функція для запису
-async function writeContacts(contacts) {
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-}
+const addContact = async (data) => {
+  return Contact.create(data);
+};
 
-export async function listContacts() {
-  return await readContacts();
-}
+const removeContact = async (id) => {
+  const contact = await Contact.findByPk(id);
+  if (!contact) return null;
+  await contact.destroy();
+  return contact;
+};
 
-export async function getContactById(contactId) {
-  const contacts = await readContacts();
-  const contact = contacts.find((c) => c.id === contactId);
-  return contact || null;
-}
+const updateContact = async (id, data) => {
+  const contact = await Contact.findByPk(id);
+  if (!contact) return null;
+  await contact.update(data);
+  return contact;
+};
 
-export async function removeContact(contactId) {
-  const contacts = await readContacts();
-  const index = contacts.findIndex((c) => c.id === contactId);
-  if (index === -1) return null;
+const updateStatusContact = async (id, { favorite }) => {
+  const contact = await Contact.findByPk(id);
+  if (!contact) return null;
+  await contact.update({ favorite });
+  return contact;
+};
 
-  const [removed] = contacts.splice(index, 1);
-  await writeContacts(contacts);
-  return removed;
-}
-
-export async function addContact(name, email, phone) {
-  const contacts = await readContacts();
-  const newContact = { id: uuidv4(), name, email, phone };
-  contacts.push(newContact);
-  await writeContacts(contacts);
-  return newContact;
-}
+export default {
+  listContacts,
+  getContactById,
+  addContact,
+  removeContact,
+  updateContact,
+  updateStatusContact,
+};

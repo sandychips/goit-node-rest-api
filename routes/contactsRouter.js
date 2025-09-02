@@ -1,22 +1,15 @@
-import express from "express";
-import {
-  getAllContacts,
-  getOneContact,
-  deleteContact,
-  createContact,
-  updateContact,
-} from "../controllers/contactsControllers.js";
+import { Router } from "express";
+import * as ctrl from "../controllers/contactsControllers.js";
 
-const contactsRouter = express.Router();
+const router = Router();
 
-contactsRouter.get("/", getAllContacts);
+router.get("/", ctrl.getAllContacts);
+router.get("/:id", ctrl.getOneContact);
+router.post("/", ctrl.createContact);
+router.put("/:id", ctrl.updateContact);
+router.delete("/:id", ctrl.deleteContact);
 
-contactsRouter.get("/:id", getOneContact);
+// PATCH /api/contacts/:contactId/favorite (і :id теж спрацює)
+router.patch("/:contactId/favorite", ctrl.updateFavorite);
 
-contactsRouter.delete("/:id", deleteContact);
-
-contactsRouter.post("/", createContact);
-
-contactsRouter.put("/:id", updateContact);
-
-export default contactsRouter;
+export default router;
