@@ -1,26 +1,33 @@
 import express from "express";
-import morgan from "morgan";
-import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
 import contactsRouter from "./routes/contactsRouter.js";
+import { initDb } from "./db/sequelize.js";
 
 const app = express();
-
-app.use(morgan("tiny"));
-app.use(cors());
 app.use(express.json());
 
+// routes
 app.use("/api/contacts", contactsRouter);
 
-app.use((_, res) => {
-  res.status(404).json({ message: "Route not found" });
+// 404
+app.use((req, res) => res.status(404).json({ message: "Not found" }));
+
+// error handler
+app.use((err, _req, res, _next) => {
+  const status = err.status || 500;
+  res.status(status).json({ message: err.message || "Server error" });
 });
 
-app.use((err, req, res, next) => {
-  const { status = 500, message = "Server error" } = err;
-  res.status(status).json({ message });
-});
+// bootstrap
+const PORT = process.env.PORT || 3000;
 
-app.listen(3000, () => {
-  console.log("Server is running. Use our API on port: 3000");
-});
+async function start() {
+  await initDb(); // підключення до БД + sync
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+start();
