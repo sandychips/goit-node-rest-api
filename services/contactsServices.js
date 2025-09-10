@@ -1,5 +1,4 @@
 import Contact from "../models/contact.js";
-import { Op } from "sequelize";
 
 const listContacts = async (owner, { page = 1, limit = 20, favorite } = {}) => {
   const where = { owner };
