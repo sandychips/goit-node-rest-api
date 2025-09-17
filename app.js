@@ -7,8 +7,13 @@ import authRouter from "./routes/authRouter.js";
 import { initDb } from "./db/sequelize.js";
 
 const app = express();
+
 app.use(express.json());
 
+// STATIC: роздача файлів з ./public
+app.use(express.static("public"));
+
+// routes
 app.use("/api/auth", authRouter);
 app.use("/api/contacts", contactsRouter);
 
@@ -20,7 +25,7 @@ app.use((err, _req, res, _next) => {
 
 const PORT = process.env.PORT || 3000;
 async function start() {
-  await initDb();
+  await initDb(); // підключення до БД + sync
   app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
 start();
