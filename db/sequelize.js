@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
+// Ensure env vars are loaded before using them at module init time
 dotenv.config();
 
 const {
