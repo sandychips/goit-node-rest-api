@@ -1,3 +1,4 @@
+// middleware/authMiddleware.js
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 
@@ -24,9 +25,15 @@ export default async function auth(req, res, next) {
       return res.status(401).json({ message: "Not authorized" });
     }
 
-    req.user = { id: user.id, email: user.email, subscription: user.subscription };
+    // ✅ додали avatarURL, щоб /current міг його повертати
+    req.user = {
+      id: user.id,
+      email: user.email,
+      subscription: user.subscription,
+      avatarURL: user.avatarURL,
+    };
     next();
-  } catch (e) {
+  } catch {
     res.status(401).json({ message: "Not authorized" });
   }
 }

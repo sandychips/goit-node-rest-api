@@ -1,3 +1,4 @@
+// controllers/authController.js
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import gravatar from "gravatar";
@@ -21,12 +22,18 @@ export const register = async (req, res, next) => {
     if (exists) return res.status(409).json({ message: "Email in use" });
 
     const hash = await bcrypt.hash(password, 10);
+
+    // згенерувати аватар через gravatar
     const avatarURL = gravatar.url(email, { s: "250", d: "retro", protocol: "https" });
 
     const user = await User.create({ email, password: hash, avatarURL });
 
     return res.status(201).json({
-      user: { email: user.email, subscription: user.subscription },
+      user: {
+        email: user.email,
+        subscription: user.subscription,
+        avatarURL: user.avatarURL,     // ✅ повертаємо аватар
+      },
     });
   } catch (e) {
     next(e);
@@ -51,7 +58,10 @@ export const login = async (req, res, next) => {
 
     return res.status(200).json({
       token,
-      user: { email: user.email, subscription: user.subscription },
+      user: {
+        email: user.email,
+        subscription: user.subscription,
+      },
     });
   } catch (e) {
     next(e);
@@ -74,6 +84,7 @@ export const current = async (req, res, next) => {
     return res.status(200).json({
       email: req.user.email,
       subscription: req.user.subscription,
+      avatarURL: req.user.avatarURL,   // ✅ повертаємо аватар
     });
   } catch (e) {
     next(e);
